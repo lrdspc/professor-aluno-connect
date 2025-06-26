@@ -145,8 +145,8 @@ async def register_student(student_data: StudentCreate, current_user: dict = Dep
 
 @app.get("/api/auth/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
-    # Remove password from response
-    user_info = {k: v for k, v in current_user.items() if k != "password"}
+    # Remove password and convert ObjectId to string
+    user_info = {k: v for k, v in current_user.items() if k not in ["password", "_id"]}
     return user_info
 
 @app.get("/api/trainer/students")
