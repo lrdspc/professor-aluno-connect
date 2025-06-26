@@ -177,63 +177,76 @@ const TrainerDashboard = () => {
         </div>
 
         {/* Students Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {students.map((student) => (
-            <Card key={student.id} className="bg-white rounded-2xl shadow-sm border-0 hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center">
-                      <span className="text-lg">{student.avatar}</span>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+          </div>
+        ) : students.length === 0 ? (
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-8 text-center">
+            <div className="text-gray-400 mb-4">
+              <Users className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-medium text-gray-600">Nenhum aluno cadastrado</h3>
+              <p className="text-sm text-gray-500 mt-2">Comece adicionando seu primeiro aluno</p>
+            </div>
+            <Button 
+              onClick={() => setIsAddStudentOpen(true)}
+              className="bg-violet-500 hover:bg-violet-600 rounded-2xl"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Primeiro Aluno
+            </Button>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {students.map((student) => (
+              <Card key={student.id} className="bg-white rounded-2xl shadow-sm border-0 hover:shadow-md transition-shadow cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center">
+                        <span className="text-lg">{student.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-slate-800">{student.name}</h4>
+                        <p className="text-sm text-slate-500">{student.objective}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800">{student.name}</h4>
-                      <p className="text-sm text-slate-500">{student.objective}</p>
+                    <Badge 
+                      variant={!student.isFirstLogin ? 'default' : 'secondary'}
+                      className={`rounded-full ${!student.isFirstLogin ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                    >
+                      {!student.isFirstLogin ? 'Ativo' : 'Novo'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Peso atual:</span>
+                      <span className="font-medium text-slate-700">{student.weight} kg</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Altura:</span>
+                      <span className="font-medium text-slate-700">{student.height} cm</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Cadastro:</span>
+                      <span className="font-medium text-slate-700">{new Date(student.createdAt || student.startDate).toLocaleDateString('pt-BR')}</span>
                     </div>
                   </div>
-                  <Badge 
-                    variant={student.status === 'active' ? 'default' : 'secondary'}
-                    className={`rounded-full ${student.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
-                  >
-                    {student.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </Badge>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Peso atual:</span>
-                    <span className="font-medium text-slate-700">{student.weight} kg</span>
+                  
+                  <div className="mt-4 flex space-x-2">
+                    <Button size="sm" variant="outline" className="flex-1 rounded-xl border-slate-200">
+                      Perfil
+                    </Button>
+                    <Button size="sm" className="flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl">
+                      Treinos
+                    </Button>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Último treino:</span>
-                    <span className="font-medium text-slate-700">{new Date(student.lastWorkout).toLocaleDateString('pt-BR')}</span>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-slate-500">Progresso</span>
-                      <span className="font-medium text-slate-700">{student.progress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
-                      <div 
-                        className="bg-violet-500 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${student.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 flex space-x-2">
-                  <Button size="sm" variant="outline" className="flex-1 rounded-xl border-slate-200">
-                    Perfil
-                  </Button>
-                  <Button size="sm" className="flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl">
-                    Treinos
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Add Student Modal */}
         <AddStudentModal 
