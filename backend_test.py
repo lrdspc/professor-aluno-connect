@@ -169,6 +169,18 @@ def main():
     # Get backend URL from environment or use default
     backend_url = "http://localhost:8001"
     
+    # Read from .env file if it exists
+    try:
+        with open('/app/.env', 'r') as f:
+            for line in f:
+                if line.startswith('REACT_APP_BACKEND_URL='):
+                    backend_url = line.strip().split('=')[1]
+                    print(f"Using backend URL from .env: {backend_url}")
+                    break
+    except Exception as e:
+        print(f"Could not read .env file, using default URL: {backend_url}")
+        print(f"Error: {str(e)}")
+    
     # Create timestamp for unique email
     timestamp = int(time.time())
     
