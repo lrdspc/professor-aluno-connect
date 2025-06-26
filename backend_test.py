@@ -187,14 +187,14 @@ def main():
     # Test data
     trainer_data = {
         "name": "Carlos Silva",
-        "email": f"carlos@trainer.com",
+        "email": f"carlos{timestamp}@trainer.com",
         "password": "123456",
         "specialization": "Musculação e Funcional"
     }
     
     student_data = {
         "name": "Maria Santos",
-        "email": f"maria@student.com",
+        "email": f"maria{timestamp}@student.com",
         "password": "123456",
         "height": 165,
         "weight": 70,
