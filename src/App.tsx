@@ -107,6 +107,10 @@ const App = () => (
                 path="/trainer/workout/:workoutId" 
                 element={<ProtectedRoute requiredRole="trainer"><WorkoutDetails /></ProtectedRoute>} 
               />
+              <Route 
+                path="/trainer/student/:studentId/progress" 
+                element={<ProtectedRoute requiredRole="trainer"><StudentProgress /></ProtectedRoute>} 
+              />
               
               {/* Student routes */}
               <Route 

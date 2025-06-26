@@ -1,7 +1,11 @@
 import os
+from dotenv import load_dotenv
 from supabase import create_client, Client
 from typing import Dict, Any, List
 from models import Workout, Progress, Exercise
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")

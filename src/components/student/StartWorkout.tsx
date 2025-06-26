@@ -94,7 +94,6 @@ const StartWorkout = () => {
         toast({
           title: "Progresso registrado",
           description: "Seu progresso foi registrado com sucesso!",
-          variant: "success"
         });
         navigate(`/workout/${workoutId}`);
       } else {

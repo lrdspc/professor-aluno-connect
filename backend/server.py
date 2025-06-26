@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
-from mcp.server import server as mcp_server
 
 # Load environment variables
 load_dotenv()
