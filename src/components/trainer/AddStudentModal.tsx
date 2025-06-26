@@ -15,7 +15,7 @@ interface AddStudentModalProps {
   onStudentAdded?: () => void; // Callback to refresh student list
 }
 
-const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange }) => {
+const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange, onStudentAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,14 +26,26 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange })
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!user?.id) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      await apiService.registerStudent({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        trainer_id: user.id,
+        height: parseFloat(formData.height),
+        weight: parseFloat(formData.weight),
+        objective: formData.objective
+      });
       
       toast({
         title: "Aluno cadastrado com sucesso!",
@@ -50,11 +62,17 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange })
         objective: ''
       });
       
+      // Refresh student list
+      if (onStudentAdded) {
+        onStudentAdded();
+      }
+      
       onOpenChange(false);
     } catch (error) {
+      console.error('Failed to register student:', error);
       toast({
         title: "Erro ao cadastrar aluno",
-        description: "Tente novamente em alguns instantes.",
+        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes.",
         variant: "destructive"
       });
     } finally {
