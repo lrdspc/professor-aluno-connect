@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Users, TrendingUp, Bell, LogOut, Clock, Target } from 'lucide-react';
 import AddStudentModal from './AddStudentModal';
+import { Student } from '@/types';
+import { apiService } from '@/services/api';
+import { toast } from '@/components/ui/use-toast';
 
 // Mock data for students
 const mockStudents = [
