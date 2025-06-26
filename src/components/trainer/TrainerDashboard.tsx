@@ -1,32 +1,40 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Users, TrendingUp, Bell, LogOut, Clock, Target } from 'lucide-react';
+import { Plus, Users, TrendingUp, Bell, LogOut, Clock, Target, Dumbbell } from 'lucide-react';
 import AddStudentModal from './AddStudentModal';
-import { Student } from '@/types';
+import { Student, Workout } from '@/types';
 import { apiService } from '@/services/api';
 import { toast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 
 const TrainerDashboard = () => {
   const { user, logout } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Fetch students from API
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        
+        // Carregar alunos
         const studentsData = await apiService.getTrainerStudents();
         setStudents(studentsData);
+        
+        // Carregar treinos
+        const workoutsData = await apiService.getTrainerWorkouts();
+        setWorkouts(workoutsData);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        console.error('Failed to fetch data:', error);
         toast({
           title: "Erro",
-          description: "Não foi possível carregar os alunos.",
+          description: "Não foi possível carregar os dados.",
           variant: "destructive"
         });
       } finally {
@@ -34,11 +42,14 @@ const TrainerDashboard = () => {
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
 
   const activeStudents = students.filter(s => !s.isFirstLogin).length;
   const avgProgress = students.length > 0 ? Math.round(students.reduce((acc, s) => acc + (Math.random() * 100), 0) / students.length) : 0;
+
+  // Filtrar treinos ativos
+  const activeWorkouts = workouts.filter(w => w.active).length;
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -265,6 +276,63 @@ const TrainerDashboard = () => {
             fetchStudents();
           }}
         />
+
+        {/* Treinos Recentes */}
+        <Card className="bg-white rounded-2xl shadow-sm border-0 mb-8">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Treinos Recentes</CardTitle>
+            <Button asChild className="bg-violet-600 hover:bg-violet-700">
+              <Link to="/create-workout">
+                <Plus className="h-4 w-4 mr-2" /> Novo Treino
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-8">Carregando treinos...</div>
+            ) : workouts.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                <Dumbbell className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                <p>Você ainda não criou nenhum treino</p>
+                <Button asChild className="mt-4 bg-violet-600 hover:bg-violet-700">
+                  <Link to="/create-workout">
+                    <Plus className="h-4 w-4 mr-2" /> Criar Primeiro Treino
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {workouts.slice(0, 5).map((workout) => (
+                  <div key={workout.id} className="py-3 flex justify-between items-center">
+                    <div>
+                      <h4 className="font-medium">{workout.name}</h4>
+                      <p className="text-sm text-slate-500">
+                        {workout.exercises.length} exercícios • Aluno: {
+                          students.find(s => s.id === workout.studentId)?.name || 'Desconhecido'
+                        }
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant={workout.active ? "success" : "destructive"}>
+                        {workout.active ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                      <Button asChild variant="outline" size="sm">
+                        <Link to={`/workout/${workout.id}`}>Ver</Link>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+          {workouts.length > 5 && (
+            <CardFooter>
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/workouts">Ver Todos os Treinos</Link>
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
       </main>
     </div>
   );

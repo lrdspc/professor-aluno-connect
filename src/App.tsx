@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +19,7 @@ const WorkoutDetails = lazy(() => import("@/components/shared/WorkoutDetails"));
 const StudentProgress = lazy(() => import("@/components/student/StudentProgress"));
 const StudentsList = lazy(() => import("@/components/trainer/StudentsList"));
 const RegisterTrainer = lazy(() => import("@/components/auth/RegisterTrainer"));
+const StartWorkout = lazy(() => import("@/components/student/StartWorkout"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -122,8 +122,22 @@ const App = () => (
                 element={<ProtectedRoute requiredRole="student"><WorkoutDetails /></ProtectedRoute>} 
               />
               <Route 
+                path="/student/workout/:workoutId/start" 
+                element={<ProtectedRoute requiredRole="student"><StartWorkout /></ProtectedRoute>} 
+              />
+              <Route 
                 path="/student/progress" 
                 element={<ProtectedRoute requiredRole="student"><StudentProgress /></ProtectedRoute>} 
+              />
+              
+              {/* Shared routes */}
+              <Route 
+                path="/workout/:workoutId" 
+                element={<ProtectedRoute><WorkoutDetails /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/create-workout/:studentId?" 
+                element={<ProtectedRoute requiredRole="trainer"><CreateWorkout /></ProtectedRoute>} 
               />
               
               {/* Fallback route */}

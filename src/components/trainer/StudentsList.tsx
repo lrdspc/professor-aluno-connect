@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Users, Search, Bell, LogOut, Filter } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Bell, LogOut, Search, Users, Filter, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AddStudentModal from './AddStudentModal';
 import { Student } from '@/types';
 import { apiService } from '@/services/api';
-import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 const StudentsList = () => {
   const { user, logout } = useAuth();
-  const [students, setStudents] = useState<Student[]>([]);
-  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'new'>('all');
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterObjective, setFilterObjective] = useState('');
 
   // Fetch students from API
   useEffect(() => {
@@ -40,34 +41,20 @@ const StudentsList = () => {
     };
 
     fetchStudents();
-  }, []);
+  }, [toast]);
 
-  // Filter and search students
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (filter === 'all') return matchesSearch;
-    if (filter === 'active') return matchesSearch && !student.isFirstLogin;
-    if (filter === 'new') return matchesSearch && student.isFirstLogin;
-    
-    return matchesSearch;
-  });
+  // Filter students based on search term and objective filter
+  const filteredStudents = students
+    .filter(student => 
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(student => 
+      filterObjective ? student.objective === filterObjective : true
+    );
 
-  const handleViewProfile = (studentId: string) => {
-    // Navigate to student profile view
-    // This would be implemented in a future update
-    console.log(`View profile for student ${studentId}`);
-  };
-
-  const handleViewWorkouts = (studentId: string) => {
-    // Navigate to student workouts
-    // This would be implemented in a future update
-    console.log(`View workouts for student ${studentId}`);
-  };
-
-  const handleCreateWorkout = (studentId: string) => {
-    navigate(`/trainer/create-workout/${studentId}`);
+  const handleStudentClick = (studentId: string) => {
+    navigate(`/trainer/students/${studentId}`);
   };
 
   return (
@@ -106,11 +93,7 @@ const StudentsList = () => {
             <p className="text-slate-500">Gerenciamento de todos os seus alunos</p>
           </div>
           <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              className="rounded-xl"
-              onClick={() => navigate('/trainer/dashboard')}
-            >
+            <Button variant="outline" onClick={() => navigate('/trainer/dashboard')} className="rounded-xl">
               Dashboard
             </Button>
             <Button 
@@ -123,43 +106,54 @@ const StudentsList = () => {
           </div>
         </div>
 
-        {/* Search and Filter */}
-        <div className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 mb-6">
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Buscar alunos..."
-              className="pl-10 rounded-xl"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex space-x-2">
-            <Button 
-              variant={filter === 'all' ? 'default' : 'outline'}
-              className={filter === 'all' ? 'bg-violet-500 hover:bg-violet-600 rounded-xl' : 'rounded-xl'}
-              onClick={() => setFilter('all')}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              Todos
-            </Button>
-            <Button
-              variant={filter === 'active' ? 'default' : 'outline'}
-              className={filter === 'active' ? 'bg-green-500 hover:bg-green-600 rounded-xl' : 'rounded-xl'}
-              onClick={() => setFilter('active')}
-            >
-              Ativos
-            </Button>
-            <Button
-              variant={filter === 'new' ? 'default' : 'outline'}
-              className={filter === 'new' ? 'bg-yellow-500 hover:bg-yellow-600 rounded-xl' : 'rounded-xl'}
-              onClick={() => setFilter('new')}
-            >
-              Novos
-            </Button>
-          </div>
-        </div>
+        {/* Filters */}
+        <Card className="bg-white rounded-2xl shadow-sm border-0 mb-6">
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 items-center">
+              <div className="relative w-full md:w-1/2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Buscar por nome ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-10 border-slate-200 rounded-xl"
+                />
+              </div>
+              <div className="w-full md:w-1/4 flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-slate-400" />
+                <Select 
+                  value={filterObjective}
+                  onValueChange={setFilterObjective}
+                >
+                  <SelectTrigger className="h-10 border-slate-200 rounded-xl">
+                    <SelectValue placeholder="Filtrar por objetivo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos os objetivos</SelectItem>
+                    <SelectItem value="emagrecimento">Emagrecimento</SelectItem>
+                    <SelectItem value="ganho-massa">Ganho de Massa</SelectItem>
+                    <SelectItem value="condicionamento">Condicionamento</SelectItem>
+                    <SelectItem value="forca">Força</SelectItem>
+                    <SelectItem value="reabilitacao">Reabilitação</SelectItem>
+                    <SelectItem value="bem-estar">Bem-estar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full md:w-1/4">
+                <Button 
+                  variant="outline"
+                  className="w-full h-10 border-slate-200 rounded-xl"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilterObjective('');
+                  }}
+                >
+                  Limpar Filtros
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Students Grid */}
         {loading ? (
@@ -170,30 +164,35 @@ const StudentsList = () => {
           <Card className="bg-white rounded-2xl shadow-sm border-0 p-8 text-center">
             <div className="text-gray-400 mb-4">
               <Users className="w-12 h-12 mx-auto mb-3" />
-              {searchTerm || filter !== 'all' ? (
-                <>
-                  <h3 className="text-lg font-medium text-gray-600">Nenhum aluno encontrado</h3>
-                  <p className="text-sm text-gray-500 mt-2">Tente mudar os filtros ou termos de busca</p>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-medium text-gray-600">Nenhum aluno cadastrado</h3>
-                  <p className="text-sm text-gray-500 mt-2">Comece adicionando seu primeiro aluno</p>
-                </>
-              )}
+              <h3 className="text-lg font-medium text-gray-600">
+                {students.length === 0 
+                  ? "Nenhum aluno cadastrado" 
+                  : "Nenhum aluno encontrado para os filtros aplicados"}
+              </h3>
+              <p className="text-sm text-gray-500 mt-2">
+                {students.length === 0 
+                  ? "Comece adicionando seu primeiro aluno"
+                  : "Tente ajustar os filtros de busca"}
+              </p>
             </div>
-            <Button 
-              onClick={() => setIsAddStudentOpen(true)}
-              className="bg-violet-500 hover:bg-violet-600 rounded-2xl"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Aluno
-            </Button>
+            {students.length === 0 && (
+              <Button 
+                onClick={() => setIsAddStudentOpen(true)}
+                className="bg-violet-500 hover:bg-violet-600 rounded-2xl"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Primeiro Aluno
+              </Button>
+            )}
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudents.map((student) => (
-              <Card key={student.id} className="bg-white rounded-2xl shadow-sm border-0 hover:shadow-md transition-shadow">
+              <Card 
+                key={student.id} 
+                className="bg-white rounded-2xl shadow-sm border-0 hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleStudentClick(student.id)}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -202,7 +201,7 @@ const StudentsList = () => {
                       </div>
                       <div>
                         <h4 className="font-semibold text-slate-800">{student.name}</h4>
-                        <p className="text-sm text-slate-500">{student.objective}</p>
+                        <p className="text-sm text-slate-500">{student.email}</p>
                       </div>
                     </div>
                     <Badge 
@@ -215,6 +214,10 @@ const StudentsList = () => {
                   
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Objetivo:</span>
+                      <span className="font-medium text-slate-700">{student.objective}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
                       <span className="text-slate-500">Peso atual:</span>
                       <span className="font-medium text-slate-700">{student.weight} kg</span>
                     </div>
@@ -226,21 +229,14 @@ const StudentsList = () => {
                       <span className="text-slate-500">Cadastro:</span>
                       <span className="font-medium text-slate-700">{new Date(student.createdAt || student.startDate).toLocaleDateString('pt-BR')}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Email:</span>
-                      <span className="font-medium text-slate-700">{student.email}</span>
-                    </div>
                   </div>
                   
-                  <div className="mt-4 flex flex-col space-y-2">
-                    <Button size="sm" variant="outline" className="rounded-xl border-slate-200" onClick={() => handleViewProfile(student.id)}>
-                      Ver Perfil
+                  <div className="mt-4 flex space-x-2">
+                    <Button size="sm" variant="outline" className="flex-1 rounded-xl border-slate-200">
+                      Perfil
                     </Button>
-                    <Button size="sm" className="bg-violet-500 hover:bg-violet-600 rounded-xl" onClick={() => handleViewWorkouts(student.id)}>
-                      Ver Treinos
-                    </Button>
-                    <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 rounded-xl" onClick={() => handleCreateWorkout(student.id)}>
-                      Criar Treino
+                    <Button size="sm" className="flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl">
+                      Treinos
                     </Button>
                   </div>
                 </CardContent>
@@ -257,10 +253,13 @@ const StudentsList = () => {
             // Refresh students list
             const fetchStudents = async () => {
               try {
+                setLoading(true);
                 const studentsData = await apiService.getTrainerStudents();
                 setStudents(studentsData);
               } catch (error) {
                 console.error('Failed to fetch students:', error);
+              } finally {
+                setLoading(false);
               }
             };
             fetchStudents();

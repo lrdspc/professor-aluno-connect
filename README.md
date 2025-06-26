@@ -1,53 +1,72 @@
-# Welcome to your Lovable project
+# Professor-Aluno Connect
 
-## Project info
+Um sistema de conexão entre professores/treinadores e alunos para acompanhamento de treinos e progresso físico.
 
-**URL**: https://lovable.dev/projects/09520528-2da2-495f-a17a-f551a63c7373
+## Tecnologias Utilizadas
 
-## How can I edit this code?
+### Frontend
+- React com TypeScript
+- Vite como bundler
+- Shadcn/UI para componentes
+- React Router para navegação
+- React Query para gerenciamento de estado
 
-There are several ways of editing your application.
+### Backend
+- Python com FastAPI
+- Supabase para banco de dados
+- JWT para autenticação
+- Modelo de dados relacional
 
-**Use Lovable**
+## Funcionalidades
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/09520528-2da2-495f-a17a-f551a63c7373) and start prompting.
+- **Autenticação**
+  - Login de treinadores e alunos
+  - Registro de novos treinadores
+  - Adição de alunos por treinadores
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Gestão de Treinos**
+  - Criação de treinos personalizados
+  - Adição de exercícios detalhados
+  - Visualização de treinos ativos
 
-**Use your preferred IDE**
+- **Acompanhamento de Progresso**
+  - Registro de sessões de treino
+  - Avaliação de dificuldade
+  - Anotações de feedback
+  - Histórico de progresso
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Configuração do Ambiente
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Pré-requisitos
+- Node.js 18+ e npm
+- Python 3.8+
+- Conta no Supabase
 
-Follow these steps:
+### Variáveis de Ambiente
+Crie um arquivo `.env` na pasta raiz do backend com:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+SUPABASE_URL=sua_url_do_supabase
+SUPABASE_KEY=sua_chave_do_supabase
+JWT_SECRET=seu_segredo_jwt
+JWT_EXPIRE_MINUTES=30
 ```
 
-**Edit a file directly in GitHub**
+### Instalação
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Backend**
+```bash
+cd backend
+pip install -r requirements.txt
+python setup_supabase.py  # Cria as tabelas necessárias no Supabase
+python server.py
+```
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
+2. **Frontend**
+```bash
+npm install
+npm run dev
+```
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
 ## What technologies are used for this project?

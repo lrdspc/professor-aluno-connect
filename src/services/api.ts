@@ -1,6 +1,6 @@
-import { User, Trainer, Student } from '@/types';
+import { User, Trainer, Student, Workout, WorkoutCreate, Progress, ProgressCreate } from '@/types';
 
-const API_BASE_URL = import.meta.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8001';
 
 interface LoginRequest {
   email: string;
@@ -114,6 +114,102 @@ class ApiService {
     });
 
     return this.handleResponse<Student[]>(response);
+  }
+
+  // Endpoints para treinos
+  async createWorkout(data: WorkoutCreate): Promise<{ message: string; id: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/workouts`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return this.handleResponse<{ message: string; id: string }>(response);
+  }
+
+  async getWorkout(workoutId: string): Promise<Workout> {
+    const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<Workout>(response);
+  }
+
+  async getStudentWorkouts(studentId: string): Promise<Workout[]> {
+    const response = await fetch(`${API_BASE_URL}/api/student/${studentId}/workouts`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<Workout[]>(response);
+  }
+
+  async getTrainerWorkouts(): Promise<Workout[]> {
+    const response = await fetch(`${API_BASE_URL}/api/trainer/workouts`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<Workout[]>(response);
+  }
+
+  async updateWorkout(workoutId: string, data: Partial<Workout>): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  async deleteWorkout(workoutId: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  // Endpoints para progresso
+  async createProgress(data: ProgressCreate): Promise<{ message: string; id: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/progress`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return this.handleResponse<{ message: string; id: string }>(response);
+  }
+
+  async getWorkoutProgress(workoutId: string): Promise<Progress[]> {
+    const response = await fetch(`${API_BASE_URL}/api/workout/${workoutId}/progress`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<Progress[]>(response);
+  }
+
+  async getStudentProgress(studentId: string): Promise<Progress[]> {
+    const response = await fetch(`${API_BASE_URL}/api/student/${studentId}/progress`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<Progress[]>(response);
+  }
+
+  async updateProgress(progressId: string, data: Partial<Progress>): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/progress/${progressId}`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return this.handleResponse<{ message: string }>(response);
   }
 
   logout(): void {

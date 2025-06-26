@@ -50,3 +50,46 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+class Exercise(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    sets: int
+    reps: int
+    rest_time: int  # em segundos
+    created_at: datetime = Field(default_factory=datetime.now)
+
+class WorkoutCreate(BaseModel):
+    student_id: str
+    name: str
+    description: str
+    exercises: List[Exercise]
+
+class Workout(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    student_id: str
+    trainer_id: str
+    name: str
+    description: str
+    exercises: List[Exercise]
+    created_at: datetime = Field(default_factory=datetime.now)
+    active: bool = True
+
+class ProgressCreate(BaseModel):
+    workout_id: str
+    student_id: str
+    date: datetime = Field(default_factory=datetime.now)
+    completed: bool
+    notes: Optional[str] = None
+    difficulty_level: int  # 1-5
+
+class Progress(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    workout_id: str
+    student_id: str
+    date: datetime
+    completed: bool
+    notes: Optional[str] = None
+    difficulty_level: int
+    created_at: datetime = Field(default_factory=datetime.now)

@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Bell, LogOut, Camera, Weight, Ruler, Target } from 'lucide-react';
+import { Bell, LogOut, Camera, Activity, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Student } from '@/types';
 
@@ -23,8 +23,8 @@ const StudentProfile = () => {
   const [formData, setFormData] = useState({
     name: student?.name || '',
     email: student?.email || '',
-    height: student?.height?.toString() || '',
-    weight: student?.weight?.toString() || '',
+    height: student?.height.toString() || '',
+    weight: student?.weight.toString() || '',
     objective: student?.objective || '',
     currentPassword: '',
     newPassword: '',
@@ -81,12 +81,17 @@ const StudentProfile = () => {
   };
 
   // Calculate BMI
-  const bmi = student?.weight / Math.pow((student?.height || 165) / 100, 2);
-  const bmiStatus = 
-    bmi < 18.5 ? { label: 'Abaixo do peso', color: 'bg-blue-500', progress: 20 } :
-    bmi < 25 ? { label: 'Peso normal', color: 'bg-green-500', progress: 50 } :
-    bmi < 30 ? { label: 'Sobrepeso', color: 'bg-yellow-500', progress: 75 } :
-    { label: 'Obesidade', color: 'bg-red-500', progress: 90 };
+  const currentWeight = parseFloat(formData.weight) || student?.weight || 0;
+  const currentHeight = parseFloat(formData.height) || student?.height || 0;
+  const bmi = currentHeight > 0 ? currentWeight / Math.pow(currentHeight / 100, 2) : 0;
+  const bmiCategory = bmi < 18.5 ? 'Abaixo do peso' : 
+                     bmi < 25 ? 'Peso normal' :
+                     bmi < 30 ? 'Sobrepeso' : 'Obesidade';
+
+  // Mock data for progress chart
+  const weeklyProgress = 85;
+  const monthlyWorkouts = 12;
+  const totalWorkouts = 45;
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -104,10 +109,10 @@ const StudentProfile = () => {
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-medium">
-                    {user?.name?.charAt(0) || 'U'}
+                    {student?.name?.charAt(0) || 'U'}
                   </span>
                 </div>
-                <span className="text-sm font-medium text-slate-700">{user?.name}</span>
+                <span className="text-sm font-medium text-slate-700">{student?.name}</span>
                 <Button variant="ghost" size="sm" onClick={logout} className="rounded-xl">
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -132,9 +137,9 @@ const StudentProfile = () => {
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-4">
                   <Avatar className="w-24 h-24">
-                    <AvatarImage src="" alt={user?.name} />
+                    <AvatarImage src="" alt={student?.name} />
                     <AvatarFallback className="bg-violet-100 text-violet-600 text-xl font-semibold">
-                      {user?.name?.charAt(0) || 'U'}
+                      {student?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <Button 
@@ -145,37 +150,27 @@ const StudentProfile = () => {
                     <Camera className="h-4 w-4 text-white" />
                   </Button>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-800">{user?.name}</h3>
+                <h3 className="text-xl font-semibold text-slate-800">{student?.name}</h3>
                 <p className="text-slate-500 mb-4">Aluno</p>
-                <div className="bg-violet-100 px-4 py-2 rounded-xl text-sm text-violet-600 mb-4">
+                <div className="bg-slate-100 px-4 py-2 rounded-xl text-sm text-slate-600 mb-4">
                   {student?.objective || 'Emagrecimento'}
-                </div>
-
-                <div className="w-full space-y-4 mb-4">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm text-slate-500">IMC</span>
-                      <span className="text-sm font-medium">{bmi.toFixed(1)} - {bmiStatus.label}</span>
-                    </div>
-                    <Progress value={bmiStatus.progress} className={`h-2 ${bmiStatus.color}`} />
-                  </div>
                 </div>
 
                 <div className="w-full">
                   <div className="flex justify-between py-3 border-t border-slate-100">
                     <span className="text-slate-500 text-sm">Altura</span>
-                    <span className="font-medium">{student?.height || 170} cm</span>
+                    <span className="font-medium">{currentHeight} cm</span>
                   </div>
                   <div className="flex justify-between py-3 border-t border-slate-100">
                     <span className="text-slate-500 text-sm">Peso</span>
-                    <span className="font-medium">{student?.weight || 70} kg</span>
+                    <span className="font-medium">{currentWeight} kg</span>
                   </div>
                   <div className="flex justify-between py-3 border-t border-slate-100">
-                    <span className="text-slate-500 text-sm">Treinos Realizados</span>
-                    <span className="font-medium">18</span>
+                    <span className="text-slate-500 text-sm">IMC</span>
+                    <span className="font-medium">{bmi.toFixed(1)} ({bmiCategory})</span>
                   </div>
                   <div className="flex justify-between py-3 border-t border-slate-100">
-                    <span className="text-slate-500 text-sm">Membro desde</span>
+                    <span className="text-slate-500 text-sm">Aluno desde</span>
                     <span className="font-medium">{new Date(student?.startDate || Date.now()).toLocaleDateString('pt-BR')}</span>
                   </div>
                 </div>
@@ -216,46 +211,37 @@ const StudentProfile = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="height">Altura (cm)</Label>
-                    <div className="relative">
-                      <Ruler className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="height"
-                        type="number"
-                        value={formData.height}
-                        onChange={handleChange('height')}
-                        disabled={!isEditing}
-                        className={`pl-10 ${!isEditing ? 'bg-slate-50' : ''}`}
-                      />
-                    </div>
+                    <Input
+                      id="height"
+                      type="number"
+                      value={formData.height}
+                      onChange={handleChange('height')}
+                      disabled={!isEditing}
+                      className={!isEditing ? 'bg-slate-50' : ''}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
-                    <div className="relative">
-                      <Weight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="weight"
-                        type="number"
-                        value={formData.weight}
-                        onChange={handleChange('weight')}
-                        disabled={!isEditing}
-                        className={`pl-10 ${!isEditing ? 'bg-slate-50' : ''}`}
-                      />
-                    </div>
+                    <Input
+                      id="weight"
+                      type="number"
+                      value={formData.weight}
+                      onChange={handleChange('weight')}
+                      disabled={!isEditing}
+                      className={!isEditing ? 'bg-slate-50' : ''}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="objective">Objetivo</Label>
-                  <div className="relative">
-                    <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input
-                      id="objective"
-                      value={formData.objective}
-                      onChange={handleChange('objective')}
-                      disabled={!isEditing}
-                      className={`pl-10 ${!isEditing ? 'bg-slate-50' : ''}`}
-                    />
-                  </div>
+                  <Label htmlFor="objective">Objetivo Principal</Label>
+                  <Input
+                    id="objective"
+                    value={formData.objective}
+                    onChange={handleChange('objective')}
+                    disabled={!isEditing}
+                    className={!isEditing ? 'bg-slate-50' : ''}
+                  />
                 </div>
 
                 {isEditing && (
@@ -321,6 +307,86 @@ const StudentProfile = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Progress Cards */}
+          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800">Progresso Semanal</h3>
+                    <p className="text-sm text-slate-500">Meta: 5 treinos</p>
+                  </div>
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <Activity className="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Completado</span>
+                    <span className="font-medium text-slate-800">{weeklyProgress}%</span>
+                  </div>
+                  <Progress value={weeklyProgress} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800">Treinos Este Mês</h3>
+                    <p className="text-sm text-slate-500">Meta: 20 treinos</p>
+                  </div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <span className="text-3xl font-bold text-slate-800">{monthlyWorkouts}</span>
+                    <span className="text-sm text-slate-500 ml-1">de 20</span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 -mr-2"
+                    onClick={() => navigate('/student/progress')}
+                  >
+                    Ver detalhes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800">Total de Treinos</h3>
+                    <p className="text-sm text-slate-500">Desde o início</p>
+                  </div>
+                  <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
+                    <Activity className="h-5 w-5 text-violet-600" />
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <span className="text-3xl font-bold text-slate-800">{totalWorkouts}</span>
+                    <span className="text-sm text-slate-500 ml-1">treinos</span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-violet-600 hover:text-violet-700 hover:bg-violet-50 -mr-2"
+                    onClick={() => navigate('/student/progress')}
+                  >
+                    Ver histórico
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>
