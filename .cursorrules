@@ -1,0 +1,79 @@
+// ... existing code ...
+- Ensure keyboard navigation support for interactive elements.
+- Use Svelte's bind:this for managing focus programmatically.
+
+Progressive Web App (PWA) Development
+
+- **Offline First:** Design the application to work offline by default. Use service workers to cache application shells, data, and assets.
+- **App-like Experience:** Ensure the PWA feels like a native app with a shell, smooth animations, and a responsive UI.
+- **Installable:** Provide a web app manifest and meet the criteria to make the app installable on users' devices.
+- **Re-engageable:** Use push notifications (with user permission) to bring users back to the app.
+- **Discoverable:** Ensure the app is easily discoverable through search engines.
+- **Secure:** Serve the application over HTTPS.
+
+**SvelteKit PWA Integration**
+- Use `vite-plugin-pwa` for integrating PWA features into a SvelteKit project.
+- Configure the service worker strategy (e.g., `GenerateSW` for simple cases, `InjectManifest` for complex logic).
+- Set up the `manifest.json` with appropriate icons, name, theme color, etc.
+
+**Service Worker**
+- Strategy: Prefer `workbox-window` to register the service worker and handle its lifecycle.
+- Caching:
+  - Cache the application shell (`StaleWhileRevalidate` or `CacheFirst`).
+  - Cache static assets (`CacheFirst` with a long expiration).
+  - Cache API responses (`NetworkFirst` or `StaleWhileRevalidate` for dynamic data).
+  - Implement background sync for offline form submissions or data updates.
+
+**Web App Manifest (`manifest.json`)**
+- **`name` & `short_name`**: Provide a clear name for the application.
+- **`icons`**: Include icons of various sizes (e.g., 192x192, 512x512) for different devices. Ensure they are maskable.
+- **`start_url`**: Define the entry point of your application.
+- **`display`**: Use `standalone` or `fullscreen` for an app-like feel.
+- **`background_color` & `theme_color`**: Match your app's branding.
+
+**Push Notifications**
+- Use the Push API for sending notifications.
+- Request user permission gracefully, explaining the value of notifications.
+- Manage subscriptions on the server-side.
+
+**Example `vite.config.ts` with `vite-plugin-pwa`**
+```typescript
+import { sveltekit } from '@sveltejs/kit/vite';
+import { SvelteKitPWA } from '@vite-plugin-pwa';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [
+    sveltekit(),
+    SvelteKitPWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Professor Aluno Connect',
+        short_name: 'P-A Connect',
+        description: 'A platform to connect trainers and students.',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+      }
+    })
+  ]
+});
+```
+
+Key Conventions
+
+1. Embrace Svelte's simplicity and avoid over-engineering solutions.
+// ... existing code ...
