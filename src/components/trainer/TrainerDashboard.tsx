@@ -251,7 +251,19 @@ const TrainerDashboard = () => {
         {/* Add Student Modal */}
         <AddStudentModal 
           open={isAddStudentOpen} 
-          onOpenChange={setIsAddStudentOpen} 
+          onOpenChange={setIsAddStudentOpen}
+          onStudentAdded={() => {
+            // Refresh students list
+            const fetchStudents = async () => {
+              try {
+                const studentsData = await apiService.getTrainerStudents();
+                setStudents(studentsData);
+              } catch (error) {
+                console.error('Failed to fetch students:', error);
+              }
+            };
+            fetchStudents();
+          }}
         />
       </main>
     </div>
