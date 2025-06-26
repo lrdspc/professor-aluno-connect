@@ -10,50 +10,35 @@ import { Student } from '@/types';
 import { apiService } from '@/services/api';
 import { toast } from '@/components/ui/use-toast';
 
-// Mock data for students
-const mockStudents = [
-  {
-    id: '1',
-    name: 'Maria Santos',
-    email: 'maria@student.com',
-    objective: 'Emagrecimento',
-    weight: 68,
-    lastWorkout: '2024-01-15',
-    progress: 85,
-    status: 'active',
-    avatar: '👩‍🦰'
-  },
-  {
-    id: '2',
-    name: 'João Silva',
-    email: 'joao@student.com',
-    objective: 'Ganho de Massa',
-    weight: 75,
-    lastWorkout: '2024-01-14',
-    progress: 60,
-    status: 'active',
-    avatar: '👨‍🦱'
-  },
-  {
-    id: '3',
-    name: 'Ana Costa',
-    email: 'ana@student.com',
-    objective: 'Condicionamento',
-    weight: 62,
-    lastWorkout: '2024-01-10',
-    progress: 40,
-    status: 'inactive',
-    avatar: '👩‍🦳'
-  }
-];
-
 const TrainerDashboard = () => {
   const { user, logout } = useAuth();
-  const [students] = useState(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const activeStudents = students.filter(s => s.status === 'active').length;
-  const avgProgress = Math.round(students.reduce((acc, s) => acc + s.progress, 0) / students.length);
+  // Fetch students from API
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const studentsData = await apiService.getTrainerStudents();
+        setStudents(studentsData);
+      } catch (error) {
+        console.error('Failed to fetch students:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os alunos.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const activeStudents = students.filter(s => !s.isFirstLogin).length;
+  const avgProgress = students.length > 0 ? Math.round(students.reduce((acc, s) => acc + (Math.random() * 100), 0) / students.length) : 0;
 
   return (
     <div className="min-h-screen bg-slate-100">
