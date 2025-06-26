@@ -9,9 +9,9 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from .database import connect_to_mongo, close_mongo_connection, get_database
-from .models import UserLogin, Token, TrainerCreate, StudentCreate, Trainer, Student
-from .auth import authenticate_user, create_access_token, get_password_hash, get_current_user
+from database import connect_to_mongo, close_mongo_connection, get_database
+from models import UserLogin, Token, TrainerCreate, StudentCreate, Trainer, Student
+from auth import authenticate_user, create_access_token, get_password_hash, get_current_user
 
 # Security
 security = HTTPBearer()
