@@ -12,6 +12,7 @@ import { apiService } from '@/services/api';
 interface AddStudentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onStudentAdded?: () => void; // Callback to refresh student list
 }
 
 const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange }) => {
