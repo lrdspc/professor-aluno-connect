@@ -42,40 +42,40 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-500 rounded-3xl mb-4">
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">FitCoach Pro</h1>
-          <p className="text-slate-600">Sua plataforma de treino personalizado</p>
+          <h1 className="text-2xl font-semibold text-slate-800 mb-2">FitCoach</h1>
+          <p className="text-slate-500 text-sm">Sua plataforma de treino personalizado</p>
         </div>
 
         {/* Main Card */}
-        <Card className="border-0 shadow-lg bg-white">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-xl font-semibold text-center">Entre na sua conta</CardTitle>
-            <CardDescription className="text-center text-slate-600">
+        <Card className="bg-white border-0 shadow-sm rounded-3xl">
+          <CardHeader className="space-y-1 pb-6 px-6 pt-6">
+            <CardTitle className="text-xl font-semibold text-center text-slate-800">Entre na sua conta</CardTitle>
+            <CardDescription className="text-center text-slate-500 text-sm">
               Escolha seu tipo de usuário e faça login
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 px-6 pb-6">
             {/* User Type Tabs */}
             <Tabs value={userType} onValueChange={(value) => setUserType(value as 'trainer' | 'student')}>
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100 rounded-lg p-1">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-100 rounded-2xl p-1 h-12">
                 <TabsTrigger 
                   value="trainer" 
-                  className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm font-medium"
                 >
                   <User className="w-4 h-4 mr-2" />
-                  Trainer
+                  Personal
                 </TabsTrigger>
                 <TabsTrigger 
                   value="student"
-                  className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm font-medium"
                 >
                   <Activity className="w-4 h-4 mr-2" />
                   Aluno
@@ -86,7 +86,7 @@ const LoginForm = () => {
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">E-mail</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700">E-mail</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
@@ -95,14 +95,14 @@ const LoginForm = () => {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-slate-700">Senha</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
@@ -111,7 +111,7 @@ const LoginForm = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
                     required
                   />
                 </div>
@@ -119,7 +119,7 @@ const LoginForm = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+                className="w-full h-12 bg-violet-500 hover:bg-violet-600 text-white font-medium rounded-2xl transition-colors"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -136,16 +136,16 @@ const LoginForm = () => {
         </Card>
 
         {/* Test Credentials */}
-        <div className="mt-6 p-4 bg-white rounded-lg border border-slate-200">
+        <div className="mt-6 p-4 bg-white rounded-2xl border-0 shadow-sm">
           <p className="text-sm font-medium text-slate-700 mb-3">Credenciais de teste:</p>
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
-              <span className="font-medium">Personal:</span>
-              <span className="text-slate-600">carlos@trainer.com / 123456</span>
+            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+              <span className="font-medium text-slate-600">Personal:</span>
+              <span className="text-slate-500">carlos@trainer.com / 123456</span>
             </div>
-            <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
-              <span className="font-medium">Aluno:</span>
-              <span className="text-slate-600">maria@student.com / 123456</span>
+            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+              <span className="font-medium text-slate-600">Aluno:</span>
+              <span className="text-slate-500">maria@student.com / 123456</span>
             </div>
           </div>
         </div>
