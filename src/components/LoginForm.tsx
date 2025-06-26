@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dumbbell, User, Mail, Lock, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const LoginForm = () => {
   const [userType, setUserType] = useState<'trainer' | 'student'>('trainer');
   const { login } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +31,9 @@ const LoginForm = () => {
           description: "Credenciais inválidas. Tente novamente.",
           variant: "destructive"
         });
+      } else {
+        // Navigate to appropriate dashboard
+        navigate(userType === 'trainer' ? '/trainer/dashboard' : '/student/dashboard');
       }
     } catch (error) {
       toast({
@@ -132,6 +137,22 @@ const LoginForm = () => {
                 )}
               </Button>
             </form>
+
+            {/* Registration link - only show for trainers */}
+            {userType === 'trainer' && (
+              <div className="text-center pt-2">
+                <p className="text-sm text-slate-600">
+                  Não tem uma conta?{' '}
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-violet-600 hover:text-violet-700"
+                    onClick={() => navigate('/register')}
+                  >
+                    Cadastre-se agora
+                  </Button>
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -152,6 +173,9 @@ const LoginForm = () => {
       </div>
     </div>
   );
+};
+
+export default LoginForm;
 };
 
 export default LoginForm;
