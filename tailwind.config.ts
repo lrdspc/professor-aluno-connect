@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -56,6 +55,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Fitness themed colors
+        fitness: {
+          primary: "hsl(262, 83%, 58%)", // violet-500 equivalent
+          secondary: "hsl(217, 91%, 60%)", // blue-500 equivalent  
+          accent: "hsl(142, 76%, 36%)", // green-600 equivalent
+          success: "hsl(142, 76%, 36%)", // green-600
+          warning: "hsl(45, 93%, 47%)", // yellow-500
+          danger: "hsl(0, 84%, 60%)", // red-500
+        },
+      },
+      backgroundImage: {
+        'fitness-gradient': 'linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(262, 83%, 48%) 100%)',
+        'fitness-gradient-secondary': 'linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(217, 91%, 50%) 100%)',
+        'fitness-gradient-accent': 'linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(142, 76%, 26%) 100%)',
       },
       borderRadius: {
         lg: "var(--radius)",
