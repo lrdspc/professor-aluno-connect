@@ -163,9 +163,10 @@ async def get_trainer_students(current_user: dict = Depends(get_current_user)):
         {"trainer_id": current_user["id"], "type": "student"}
     ).to_list(length=None)
     
-    # Remove passwords from response
+    # Remove passwords and ObjectIds from response
     for student in students:
         student.pop("password", None)
+        student.pop("_id", None)
     
     return students
 
