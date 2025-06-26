@@ -52,6 +52,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     user = await db.users.find_one({"email": token_data.email})
     if user is None:
         raise credentials_exception
+    
+    # Convert ObjectId to string and remove it from response
+    if "_id" in user:
+        user.pop("_id")
+    
     return user
 
 async def authenticate_user(email: str, password: str, user_type: str):
