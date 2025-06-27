@@ -1,11 +1,14 @@
 fastapi==0.104.1
 uvicorn==0.24.0
-motor==3.3.2
+# motor==3.3.2 # Removed MongoDB driver
 pydantic==2.5.0
-python-jose==3.3.0
-passlib==1.7.4
-bcrypt==4.0.1
+python-jose==3.3.0 # Kept for JWT handling if Supabase tokens are inspected or other JWTs are used
+# passlib==1.7.4 # Removed, Supabase handles password hashing
+# bcrypt==4.0.1 # Removed, Supabase handles password hashing
 python-multipart==0.0.6
 python-dotenv==1.0.0
-pymongo==4.6.0
-supabase==2.3.5
+# pymongo==4.6.0 # Removed MongoDB driver
+supabase==2.3.5 # Supabase Python client (v2.x includes async and gotrue)
+httpx==0.25.2 # Required for supabase async client operations (version example)
+# gotrue==2.13.0 # This should be a transitive dependency of supabase v2.x, can be removed if so.
+# supabase-py-async is deprecated in favor of supabase v2.x's built-in async support.

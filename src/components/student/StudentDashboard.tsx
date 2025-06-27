@@ -1,51 +1,106 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { Play, CheckCircle, User, TrendingUp, Calendar, LogOut, Settings, Dumbbell } from 'lucide-react';
-import { Student, Workout, Progress as WorkoutProgress } from '@/types';
+import { Workout, Progress as WorkoutProgress } from '@/types';
+// import { Database } from '@/types/supabase';
+// type Workout = Database['public']['Tables']['workouts']['Row'];
+// type WorkoutProgress = Database['public']['Tables']['progress']['Row'];
+
 import { apiService } from '@/services/api';
+import { supabase } from '@/lib/supabaseClient';
+import { RealtimeChannel } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // Import useQuery
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 
 const StudentDashboard = () => {
-  const { user, logout } = useAuth();
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [progressHistory, setProgressHistory] = useState<WorkoutProgress[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, profile, logout } = useAuth();
+  const workoutsChannelRef = useRef<RealtimeChannel | null>(null);
+  const queryClient = useQueryClient(); // For potential invalidation
 
+  // Fetch student's workouts using useQuery
+  const { data: workouts = [], isLoading: isLoadingWorkouts, refetch: refetchWorkouts } = useQuery<Workout[], Error>({
+    queryKey: ['studentWorkouts', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) throw new Error("Student ID not available");
+      return apiService.getStudentWorkouts(profile.id);
+    },
+    enabled: !!profile?.id,
+    onError: (err) => toast({ title: "Erro ao carregar treinos", description: err.message, variant: "destructive" })
+  });
+
+  // Fetch student's progress history using useQuery
+  const { data: progressHistory = [], isLoading: isLoadingProgress } = useQuery<WorkoutProgress[], Error>({
+    queryKey: ['studentProgress', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) throw new Error("Student ID not available");
+      return apiService.getStudentProgress(profile.id);
+    },
+    enabled: !!profile?.id,
+    onError: (err) => toast({ title: "Erro ao carregar histórico de progresso", description: err.message, variant: "destructive" })
+  });
+
+  const isLoading = isLoadingWorkouts || isLoadingProgress;
+
+  // Realtime subscription for workouts
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
-        
-        // Carregar treinos do aluno
-        const workoutsData = await apiService.getStudentWorkouts(user.id);
-        setWorkouts(workoutsData);
-        
-        // Carregar progresso do aluno
-        const progressData = await apiService.getStudentProgress(user.id);
-        setProgressHistory(progressData);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os dados.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
+    if (!profile || !profile.id) return; // Ensure student profile ID is available
+
+    // Clean up previous channel if profile.id changes or component unmounts
+    if (workoutsChannelRef.current) {
+        supabase.removeChannel(workoutsChannelRef.current);
+        workoutsChannelRef.current = null;
+    }
+
+    workoutsChannelRef.current = supabase
+      .channel(`student_workouts_${profile.id}`) // Unique channel name per student
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'workouts',
+          filter: `student_id=eq.${profile.id}`, // Filter for this student's workouts
+        },
+        (payload) => {
+          console.log('Realtime workout change received!', payload);
+          toast({
+            title: "Atualização de Treino",
+            description: `Seus treinos foram atualizados. Recarregando...`,
+          });
+          // Refetch workouts to get the latest data
+          // A more optimized approach would be to update the local state based on payload (new, old)
+          fetchStudentData();
+        }
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`Subscribed to workout changes for student ${profile.id}`);
+        }
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('Realtime subscription error:', status, err);
+          toast({
+            title: "Erro na Sincronização",
+            description: "Não foi possível sincronizar os treinos em tempo real.",
+            variant: "destructive"
+          });
+        }
+      });
+
+    // Cleanup subscription on component unmount
+    return () => {
+      if (workoutsChannelRef.current) {
+        supabase.removeChannel(workoutsChannelRef.current);
       }
     };
+  }, [profile]); // Depend on profile to set up the channel correctly
 
-    fetchData();
-  }, [user]);
-
-  // Cálculos para estatísticas
+  // Cálculos para estatísticas (ensure workouts and progressHistory are defined)
   const totalWorkouts = workouts.length;
   const activeWorkouts = workouts.filter(w => w.active).length;
   
@@ -101,8 +156,19 @@ const StudentDashboard = () => {
             <CardTitle>Próximo Treino</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="text-center py-8">Carregando treino...</div>
+            {isLoading ? (
+              <div className="space-y-4 p-1"> {/* Added p-1 for slight spacing if needed */}
+                <Skeleton className="h-6 w-3/5" /> {/* Title */}
+                <Skeleton className="h-4 w-4/5" /> {/* Description */}
+                <div className="space-y-2 pt-2">
+                  <Skeleton className="h-12 w-full" /> {/* Exercise item */}
+                  <Skeleton className="h-12 w-full" /> {/* Exercise item */}
+                </div>
+                <div className="flex justify-between pt-3">
+                  <Skeleton className="h-10 w-1/3" /> {/* Button */}
+                  <Skeleton className="h-10 w-1/3" /> {/* Button */}
+                </div>
+              </div>
             ) : !nextWorkout ? (
               <div className="text-center py-8 text-slate-500">
                 <Dumbbell className="h-12 w-12 mx-auto mb-3 text-slate-300" />
@@ -158,8 +224,18 @@ const StudentDashboard = () => {
             <CardTitle>Meus Treinos</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="text-center py-8">Carregando treinos...</div>
+            {isLoading ? (
+              <div className="space-y-4 divide-y">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="py-3 flex justify-between items-center">
+                    <div className="space-y-2">
+                      <Skeleton className="h-5 w-40 sm:w-48" />
+                      <Skeleton className="h-4 w-24 sm:w-32" />
+                    </div>
+                    <Skeleton className="h-8 w-20" />
+                  </div>
+                ))}
+              </div>
             ) : workouts.length === 0 ? (
               <div className="text-center py-8 text-slate-500">
                 <Dumbbell className="h-12 w-12 mx-auto mb-3 text-slate-300" />

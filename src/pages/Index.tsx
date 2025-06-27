@@ -1,18 +1,39 @@
 import { Button } from '@/components/ui/button';
 import { Dumbbell, ArrowRight, Users, Activity, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const Index = () => {
   const navigate = useNavigate();
+  const pageTitle = "FitCoach Pro | Conectando Personal Trainers e Alunos";
+  const pageDescription = "Plataforma completa para personal trainers gerenciarem alunos, treinos e progresso. Para alunos, acompanhamento fácil e eficaz. Junte-se ao FitCoach Pro!";
 
   const handleGetStarted = () => {
     navigate('/login');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-100">
-      {/* Navigation */}
-      <header className="bg-white shadow-sm border-b">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {/* <meta property="og:image" content="URL_DA_IMAGEM_PARA_OG" /> */}
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={pageTitle} />
+        <meta property="twitter:description" content={pageDescription} />
+        {/* <meta property="twitter:image" content="URL_DA_IMAGEM_PARA_TWITTER_CARD" /> */}
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-100">
+        {/* Navigation */}
+        <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -104,6 +125,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

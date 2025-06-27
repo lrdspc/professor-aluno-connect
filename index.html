@@ -21,6 +21,19 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@fitcoach_pro" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' 'unsafe-inline' https://*.supabase.co https://*.supabase.io;
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   img-src 'self' data: blob: https://*.supabase.co https://*.supabase.io https://lovable.dev;
+                   font-src 'self' https://fonts.gstatic.com;
+                   connect-src 'self' https://*.supabase.co https://*.supabase.io ws://localhost:* wss://localhost:*;
+                   frame-src 'self' https://*.supabase.co https://*.supabase.io;
+                   object-src 'none';
+                   base-uri 'self';
+                   form-action 'self';"
+    >
   </head>
 
   <body>
