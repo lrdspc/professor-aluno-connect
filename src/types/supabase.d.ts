@@ -1,9 +1,3 @@
-// This is a placeholder file for Supabase types.
-// You should generate the actual types from your Supabase project:
-// supabase gen types typescript --project-id "$PROJECT_ID" --schema public > src/types/supabase.d.ts
-//
-// For now, we'll define a minimal Database type to avoid errors.
-
 export type Json =
   | string
   | number
@@ -17,21 +11,21 @@ export interface Database {
     Tables: {
       profiles: {
         Row: {
-          id: string // UUID, references auth.users.id
+          id: string
           created_at: string
           name: string | null
-          email: string | null // Should match auth.users.email
+          email: string | null
           user_type: 'trainer' | 'student' | null
-          specialization: string | null // For trainers
-          trainer_id: string | null // For students, references another profile id
-          height: number | null // For students
-          weight: number | null // For students
-          objective: string | null // For students
+          specialization: string | null
+          trainer_id: string | null
+          height: number | null
+          weight: number | null
+          objective: string | null
           is_first_login: boolean | null
-          avatar_url: string | null // For profile picture
+          avatar_url: string | null
         }
         Insert: {
-          id: string // Usually provided by auth.users.id
+          id: string
           created_at?: string
           name?: string | null
           email?: string | null
@@ -73,8 +67,98 @@ export interface Database {
           }
         ]
       }
-      // Define workouts and progress tables here as well for full type safety
-      // For now, keeping it minimal.
+      workouts: {
+        Row: {
+          id: string
+          student_id: string
+          trainer_id: string
+          name: string
+          description: string | null
+          exercises: Json
+          active: boolean | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          trainer_id: string
+          name: string
+          description?: string | null
+          exercises?: Json
+          active?: boolean | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          trainer_id?: string
+          name?: string
+          description?: string | null
+          exercises?: Json
+          active?: boolean | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workouts_student_id_fkey"
+            columns: ["student_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workouts_trainer_id_fkey"
+            columns: ["trainer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      progress: {
+        Row: {
+          id: string
+          workout_id: string
+          student_id: string
+          date: string
+          completed: boolean | null
+          notes: string | null
+          difficulty_level: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workout_id: string
+          student_id: string
+          date?: string
+          completed?: boolean | null
+          notes?: string | null
+          difficulty_level?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workout_id?: string
+          student_id?: string
+          date?: string
+          completed?: boolean | null
+          notes?: string | null
+          difficulty_level?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_workout_id_fkey"
+            columns: ["workout_id"]
+            referencedRelation: "workouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progress_student_id_fkey"
+            columns: ["student_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -83,7 +167,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      user_type_enum: 'trainer' | 'student' // Example if you use an ENUM type in PG
+      user_type_enum: 'trainer' | 'student'
     }
     CompositeTypes: {
       [_ in never]: never
