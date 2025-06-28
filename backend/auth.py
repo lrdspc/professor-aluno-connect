@@ -43,6 +43,8 @@ async def get_current_supabase_user(credentials: HTTPAuthorizationCredentials = 
         # The user object returned by Supabase's getUser might vary.
         # Typically, it contains id, email, aud, role, etc.
         user_response = supabase_admin_client.auth.get_user(token)
+        if asyncio.iscoroutine(user_response):
+            user_response = await user_response
 
         if not user_response or not user_response.user:
              raise HTTPException(
