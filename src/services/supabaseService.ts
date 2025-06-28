@@ -197,21 +197,6 @@ export class SupabaseService {
     return data || [];
   }
 
-  async updateProgress(progressId: string, updates: Partial<Progress>): Promise<Progress | null> {
-    const { data, error } = await supabase
-      .from('progress')
-      .update(updates)
-      .eq('id', progressId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating progress:', error);
-      throw error;
-    }
-    return data;
-  }
-
   // Real-time subscriptions
   subscribeToWorkouts(studentId: string, callback: (payload: any) => void) {
     return supabase

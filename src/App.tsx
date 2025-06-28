@@ -8,9 +8,10 @@ import LoginForm from "@/components/LoginForm";
 import TrainerDashboard from "@/components/trainer/TrainerDashboard";
 import StudentDashboard from "@/components/student/StudentDashboard";
 import NotFound from "@/pages/NotFound";
+import Index from "@/pages/Index";
 import { Suspense, lazy } from "react";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { HelmetProvider } from 'react-helmet-async';
+import ErrorBoundary from "@/components/ErrorBoundary"; // Import ErrorBoundary
+import { HelmetProvider } from 'react-helmet-async'; // Import HelmetProvider
 
 // Lazy loaded components
 const TrainerProfile = lazy(() => import("@/components/trainer/TrainerProfile"));
@@ -25,9 +26,10 @@ const StartWorkout = lazy(() => import("@/components/student/StartWorkout"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * (60 * 1000),
+      retry: 1, // Re-tentar uma vez em caso de falha
+      refetchOnWindowFocus: false, // Evitar refetch automático ao focar na janela
+      staleTime: 5 * (60 * 1000), // 5 minutos de staleTime padrão
+      // cacheTime: 10 * (60 * 1000), // 10 minutos de cacheTime padrão (padrão do react-query é 5 min)
     },
   },
 });
@@ -37,7 +39,7 @@ const ProtectedRoute = ({ children, requiredRole }: { children: JSX.Element, req
   const { user, isTrainer, isStudent } = useAuth();
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (requiredRole === 'trainer' && !isTrainer()) {
@@ -58,11 +60,10 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Main app content - redirects authenticated users to appropriate dashboard
 const AppContent = () => {
   const { user, isTrainer, isStudent } = useAuth();
 
-  // If user is logged in, redirect to appropriate dashboard
+  // Redirect to appropriate dashboard if logged in
   if (user) {
     if (isTrainer()) {
       return <Navigate to="/trainer/dashboard" replace />;
@@ -72,8 +73,7 @@ const AppContent = () => {
     }
   }
 
-  // If not logged in, show login form
-  return <LoginForm />;
+  return <Index />;
 };
 
 // App component structure
@@ -94,79 +94,77 @@ const App = () => (
             <BrowserRouter>
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
-                  {/* Main route - Login or redirect to dashboard */}
-                  <Route path="/" element={<AppContent />} />
-                  
-                  {/* Auth routes */}
-                  <Route path="/login" element={<LoginForm />} />
-                  <Route path="/register" element={<RegisterTrainer />} />
+                  {/* Public routes */}
+                <Route path="/" element={<AppContent />} />
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterTrainer />} />
 
-                  {/* Trainer routes */}
-                  <Route
-                    path="/trainer/dashboard"
-                    element={<ProtectedRoute requiredRole="trainer"><TrainerDashboard /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/trainer/profile"
-                    element={<ProtectedRoute requiredRole="trainer"><TrainerProfile /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/trainer/students"
-                    element={<ProtectedRoute requiredRole="trainer"><StudentsList /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/trainer/create-workout/:studentId?"
-                    element={<ProtectedRoute requiredRole="trainer"><CreateWorkout /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/trainer/workout/:workoutId"
-                    element={<ProtectedRoute requiredRole="trainer"><WorkoutDetails /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/trainer/student/:studentId/progress"
-                    element={<ProtectedRoute requiredRole="trainer"><StudentProgress /></ProtectedRoute>}
-                  />
+                {/* Trainer routes */}
+                <Route
+                  path="/trainer/dashboard"
+                  element={<ProtectedRoute requiredRole="trainer"><TrainerDashboard /></ProtectedRoute>}
+                />
+                <Route
+                  path="/trainer/profile"
+                  element={<ProtectedRoute requiredRole="trainer"><TrainerProfile /></ProtectedRoute>}
+                />
+                <Route
+                  path="/trainer/students"
+                  element={<ProtectedRoute requiredRole="trainer"><StudentsList /></ProtectedRoute>}
+                />
+                <Route
+                  path="/trainer/create-workout/:studentId?"
+                  element={<ProtectedRoute requiredRole="trainer"><CreateWorkout /></ProtectedRoute>}
+                />
+                <Route
+                  path="/trainer/workout/:workoutId"
+                  element={<ProtectedRoute requiredRole="trainer"><WorkoutDetails /></ProtectedRoute>}
+                />
+                <Route
+                  path="/trainer/student/:studentId/progress"
+                  element={<ProtectedRoute requiredRole="trainer"><StudentProgress /></ProtectedRoute>}
+                />
 
-                  {/* Student routes */}
-                  <Route
-                    path="/student/dashboard"
-                    element={<ProtectedRoute requiredRole="student"><StudentDashboard /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/student/profile"
-                    element={<ProtectedRoute requiredRole="student"><StudentProfile /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/student/workout/:workoutId"
-                    element={<ProtectedRoute requiredRole="student"><WorkoutDetails /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/student/workout/:workoutId/start"
-                    element={<ProtectedRoute requiredRole="student"><StartWorkout /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/student/progress"
-                    element={<ProtectedRoute requiredRole="student"><StudentProgress /></ProtectedRoute>}
-                  />
+                {/* Student routes */}
+                <Route
+                  path="/student/dashboard"
+                  element={<ProtectedRoute requiredRole="student"><StudentDashboard /></ProtectedRoute>}
+                />
+                <Route
+                  path="/student/profile"
+                  element={<ProtectedRoute requiredRole="student"><StudentProfile /></ProtectedRoute>}
+                />
+                <Route
+                  path="/student/workout/:workoutId"
+                  element={<ProtectedRoute requiredRole="student"><WorkoutDetails /></ProtectedRoute>}
+                />
+                <Route
+                  path="/student/workout/:workoutId/start"
+                  element={<ProtectedRoute requiredRole="student"><StartWorkout /></ProtectedRoute>}
+                />
+                <Route
+                  path="/student/progress"
+                  element={<ProtectedRoute requiredRole="student"><StudentProgress /></ProtectedRoute>}
+                />
 
-                  {/* Shared routes */}
-                  <Route
-                    path="/workout/:workoutId"
-                    element={<ProtectedRoute><WorkoutDetails /></ProtectedRoute>}
-                  />
-                  <Route
-                    path="/create-workout/:studentId?"
-                    element={<ProtectedRoute requiredRole="trainer"><CreateWorkout /></ProtectedRoute>}
-                  />
+                {/* Shared routes */}
+                <Route
+                  path="/workout/:workoutId"
+                  element={<ProtectedRoute><WorkoutDetails /></ProtectedRoute>}
+                />
+                <Route
+                  path="/create-workout/:studentId?"
+                  element={<ProtectedRoute requiredRole="trainer"><CreateWorkout /></ProtectedRoute>}
+                />
 
-                  {/* Fallback route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+                {/* Fallback route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
     </HelmetProvider>
   </ErrorBoundary>
 );
