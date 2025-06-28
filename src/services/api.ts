@@ -1,8 +1,8 @@
 import { supabaseService } from './supabaseService';
 import { Database } from '@/types/supabase';
 
-// Re-export Supabase service methods for backward compatibility
-// This allows existing components to continue working while we migrate
+// Simplified API service that wraps Supabase operations
+// This provides a clean interface for components while using Supabase directly
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Workout = Database['public']['Tables']['workouts']['Row'];
@@ -18,11 +18,9 @@ class ApiService {
     return supabaseService.updateProfile(userId, updates);
   }
 
-  // Trainer operations
-  async getTrainerStudents(): Promise<Profile[]> {
-    // This will need the current user's ID, which should come from AuthContext
-    // For now, we'll throw an error to indicate this needs to be called differently
-    throw new Error('getTrainerStudents requires trainer ID - use supabaseService directly');
+  // Trainer operations - now requires trainer ID to be passed
+  async getTrainerStudents(trainerId: string): Promise<Profile[]> {
+    return supabaseService.getTrainerStudents(trainerId);
   }
 
   // Workout operations
@@ -38,9 +36,8 @@ class ApiService {
     return supabaseService.getStudentWorkouts(studentId);
   }
 
-  async getTrainerWorkouts() {
-    // This will need the current user's ID
-    throw new Error('getTrainerWorkouts requires trainer ID - use supabaseService directly');
+  async getTrainerWorkouts(trainerId: string) {
+    return supabaseService.getTrainerWorkouts(trainerId);
   }
 
   async updateWorkout(workoutId: string, data: any) {
@@ -65,13 +62,12 @@ class ApiService {
   }
 
   async updateProgress(progressId: string, data: any) {
-    // This method needs to be implemented in supabaseService
-    throw new Error('updateProgress not implemented yet');
+    return supabaseService.updateProgress(progressId, data);
   }
 }
 
 export const apiService = new ApiService();
 export default apiService;
 
-// Also export the supabaseService for direct use
+// Also export the supabaseService for direct use when needed
 export { supabaseService };

@@ -9,13 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit",
-    "test": "echo \"No tests specified yet\"",
-    "supabase:start": "supabase start",
-    "supabase:stop": "supabase stop",
-    "supabase:reset": "supabase db reset",
-    "supabase:migrate": "supabase db push",
-    "supabase:types": "supabase gen types typescript --local > src/types/supabase.d.ts"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
