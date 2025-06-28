@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react'; // Removed useState
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { useToast } from '@/components/ui/use-toast'; // Toasts for submission errors handled by AuthContext
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Dumbbell, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Dumbbell, Mail, Lock, User, ArrowLeft, UserCheck } from 'lucide-react';
 import { Database } from '@/types/supabase';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-
+import { Helmet } from 'react-helmet-async';
 
 // Zod Schema for validation
 const passwordValidation = z.string()
@@ -64,182 +63,230 @@ const RegisterTrainer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-500 rounded-3xl mb-4">
-            <Dumbbell className="w-8 h-8 text-white" />
+    <>
+      <Helmet>
+        <title>Cadastro Personal Trainer - FitCoach Pro</title>
+        <meta name="description" content="Cadastre-se como Personal Trainer no FitCoach Pro e comece a gerenciar seus alunos de forma profissional" />
+      </Helmet>
+
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-lg">
+          {/* Header com branding */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-violet-500 rounded-3xl mb-6 shadow-lg">
+              <Dumbbell className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800 mb-2">FitCoach Pro</h1>
+            <p className="text-slate-600 text-sm">Cadastre-se como Personal Trainer</p>
           </div>
-          <h1 className="text-2xl font-semibold text-slate-800 mb-2">FitCoach Pro</h1>
-          <p className="text-slate-500 text-sm">Cadastre-se como Personal Trainer</p>
-        </div>
 
-        <Card className="bg-white border-0 shadow-sm rounded-3xl">
-          <CardHeader className="space-y-1 pb-6 px-6 pt-6">
-            <CardTitle className="text-xl font-semibold text-center text-slate-800">Criar uma nova conta</CardTitle>
-            <CardDescription className="text-center text-slate-500 text-sm">
-              Preencha os dados abaixo para começar a usar a plataforma
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6 px-6 pb-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="name" className="text-sm font-medium text-slate-700">Nome Completo</FormLabel>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <FormControl>
-                          <Input
-                            id="name"
-                            placeholder="Seu nome completo"
-                            className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
+          <Card className="bg-white border-0 shadow-xl rounded-3xl">
+            <CardHeader className="space-y-1 pb-6 px-8 pt-8">
+              <CardTitle className="text-2xl font-bold text-center text-slate-800 flex items-center justify-center gap-2">
+                <UserCheck className="w-6 h-6 text-violet-500" />
+                Criar Conta de Trainer
+              </CardTitle>
+              <CardDescription className="text-center text-slate-500">
+                Preencha os dados abaixo para começar a usar a plataforma
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6 px-8 pb-8">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="name" className="text-sm font-medium text-slate-700">
+                          Nome Completo
+                        </FormLabel>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <FormControl>
+                            <Input
+                              id="name"
+                              placeholder="Seu nome completo"
+                              className="pl-12 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white text-base"
+                              disabled={loading}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="email" className="text-sm font-medium text-slate-700">
+                          E-mail Profissional
+                        </FormLabel>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <FormControl>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="seu@email.com"
+                              className="pl-12 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white text-base"
+                              disabled={loading}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="specialization"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="specialization" className="text-sm font-medium text-slate-700">
+                          Especialização Principal
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white text-base">
+                              <SelectValue placeholder="Selecione sua especialização" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="musculação">Musculação</SelectItem>
+                            <SelectItem value="funcional">Treinamento Funcional</SelectItem>
+                            <SelectItem value="crossfit">CrossFit</SelectItem>
+                            <SelectItem value="pilates">Pilates</SelectItem>
+                            <SelectItem value="yoga">Yoga</SelectItem>
+                            <SelectItem value="reabilitação">Reabilitação</SelectItem>
+                            <SelectItem value="emagrecimento">Emagrecimento</SelectItem>
+                            <SelectItem value="hipertrofia">Hipertrofia</SelectItem>
+                            <SelectItem value="condicionamento">Condicionamento Físico</SelectItem>
+                            <SelectItem value="outro">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="password" className="text-sm font-medium text-slate-700">
+                          Senha
+                        </FormLabel>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <FormControl>
+                            <Input
+                              id="password"
+                              type="password"
+                              placeholder="•••••••• (mín. 6 caracteres)"
+                              className="pl-12 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white text-base"
+                              disabled={loading}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">
+                          Confirmar Senha
+                        </FormLabel>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <FormControl>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              placeholder="••••••••"
+                              className="pl-12 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white text-base"
+                              disabled={loading}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-violet-500 hover:bg-violet-600 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl mt-8"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Criando conta...
                       </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="email" className="text-sm font-medium text-slate-700">E-mail</FormLabel>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <FormControl>
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="seu@email.com"
-                            className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="password" className="text-sm font-medium text-slate-700">Senha</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <FormControl>
-                          <Input
-                            id="password"
-                            type="password"
-                            placeholder="•••••••• (mín. 6 caracteres)"
-                            className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">Confirmar Senha</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <FormControl>
-                          <Input
-                            id="confirmPassword"
-                            type="password"
-                            placeholder="••••••••"
-                            className="pl-10 h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white"
-                            disabled={loading}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="specialization"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="specialization" className="text-sm font-medium text-slate-700">Especialização</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
-                        <FormControl>
-                          <SelectTrigger className="h-12 border border-slate-200 rounded-2xl focus:border-violet-500 focus:ring-violet-500 bg-white">
-                            <SelectValue placeholder="Selecione sua especialização" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="musculação">Musculação</SelectItem>
-                          <SelectItem value="funcional">Treinamento Funcional</SelectItem>
-                          <SelectItem value="crossfit">CrossFit</SelectItem>
-                          <SelectItem value="pilates">Pilates</SelectItem>
-                          <SelectItem value="yoga">Yoga</SelectItem>
-                          <SelectItem value="reabilitação">Reabilitação</SelectItem>
-                          <SelectItem value="emagrecimento">Emagrecimento</SelectItem>
-                          <SelectItem value="hipertrofia">Hipertrofia</SelectItem>
-                          <SelectItem value="outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-violet-500 hover:bg-violet-600 text-white font-medium rounded-2xl transition-colors mt-6"
+                    ) : (
+                      'Criar Conta de Personal Trainer'
+                    )}
+                  </Button>
+                </form>
+              </Form>
+              
+              <div className="text-center pt-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate('/')} 
+                  className="text-sm text-slate-600 hover:text-violet-600 font-medium"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Cadastrando...
-                    </div>
-                  ) : (
-                    'Cadastrar'
-                  )}
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar para Login
                 </Button>
-              </form>
-            </Form>
-            <div className="text-center">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate('/login')} 
-                className="text-sm text-slate-600 hover:text-violet-600"
-                disabled={loading}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar para Login
-              </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Informações adicionais */}
+          <div className="mt-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3 text-center">
+              ✨ O que você terá acesso:
+            </h3>
+            <div className="grid grid-cols-1 gap-2 text-xs text-slate-600">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
+                <span>Gerenciamento completo de alunos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
+                <span>Criação de treinos personalizados</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
+                <span>Acompanhamento de progresso em tempo real</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
+                <span>Dashboard com métricas e relatórios</span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
