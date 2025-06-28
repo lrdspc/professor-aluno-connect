@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 248 250 252;
+    --foreground: 51 65 85;
+    --card: 255 255 255;
+    --card-foreground: 51 65 85;
+    --popover: 255 255 255;
+    --popover-foreground: 51 65 85;
+    --primary: 139 92 246;
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 51 65 85;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
+    --accent: 168 85 247;
+    --accent-foreground: 255 255 255;
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 250 252;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 139 92 246;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-slate-100 text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Custom gradient backgrounds */
+.gradient-orange {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+}
+
+.gradient-indigo {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+}
+
+/* Fitness themed gradients */
+.fitness-gradient {
+  background: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(262, 83%, 48%) 100%);
+}
+
+.fitness-gradient-secondary {
+  background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(217, 91%, 50%) 100%);
+}
+
+.fitness-gradient-accent {
+  background: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(142, 76%, 26%) 100%);
+}
+
+/* Fitness themed text colors */
+.text-fitness-primary {
+  color: hsl(262, 83%, 58%);
+}
+
+.text-fitness-secondary {
+  color: hsl(217, 91%, 60%);
+}
+
+.text-fitness-accent {
+  color: hsl(142, 76%, 36%);
+}
+
+/* Fitness themed background colors */
+.bg-fitness-primary {
+  background-color: hsl(262, 83%, 58%);
+}
+
+.bg-fitness-secondary {
+  background-color: hsl(217, 91%, 60%);
+}
+
+.bg-fitness-accent {
+  background-color: hsl(142, 76%, 36%);
+}
+
+/* Fitness themed border colors */
+.border-fitness-primary {
+  border-color: hsl(262, 83%, 58%);
+}
+
+.border-fitness-secondary {
+  border-color: hsl(217, 91%, 60%);
+}
+
+.border-fitness-accent {
+  border-color: hsl(142, 76%, 36%);
+}
+
+/* Hover states */
+.hover\:bg-fitness-primary\/90:hover {
+  background-color: hsl(262, 83%, 48%);
+}
+
+.hover\:bg-fitness-secondary\/90:hover {
+  background-color: hsl(217, 91%, 50%);
+}
+
+.hover\:bg-fitness-accent\/90:hover {
+  background-color: hsl(142, 76%, 26%);
+}
+
+/* Card styles */
+.workout-card {
+  @apply bg-white rounded-2xl p-4 shadow-sm border-0;
+}
+
+.progress-card {
+  @apply bg-white rounded-2xl p-6 shadow-sm border-0;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-2xl font-medium transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl font-medium border border-gray-200 transition-colors;
+}
