@@ -1,55 +1,77 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, lazy, Suspense } from 'react'; // Added lazy, Suspense
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Users, TrendingUp, Bell, LogOut, Clock, Target, Dumbbell } from 'lucide-react';
-import AddStudentModal from './AddStudentModal';
-import { Student, Workout } from '@/types';
+import { useAuth, UserProfile } from '@/contexts/AuthContext'; // UserProfile for students type
+import { Plus, Users, TrendingUp, Bell, LogOut, Clock, Target, Dumbbell, AlertCircle } from 'lucide-react';
+// import AddStudentModal from './AddStudentModal'; // Will be lazy loaded
+const AddStudentModal = lazy(() => import('./AddStudentModal'));
+// Assuming Workout type is still from '@/types' or should be from supabase types
+import { Workout } from '@/types';
+// import { Database } from '@/types/supabase';
+// type Workout = Database['public']['Tables']['workouts']['Row'];
+// type Student = Database['public']['Tables']['profiles']['Row']; // Using UserProfile now
+
 import { apiService } from '@/services/api';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const TrainerDashboard = () => {
-  const { user, logout } = useAuth();
-  const [students, setStudents] = useState<Student[]>([]);
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const { user, profile, logout } = useAuth(); // profile.id is the trainer's ID
+  const { toast } = useToast();
+  const queryClient = useQueryClient(); // For invalidation on student add
+
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch students from API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // Carregar alunos
-        const studentsData = await apiService.getTrainerStudents();
-        setStudents(studentsData);
-        
-        // Carregar treinos
-        const workoutsData = await apiService.getTrainerWorkouts();
-        setWorkouts(workoutsData);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os dados.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch trainer's students using useQuery
+  const { data: students = [], isLoading: isLoadingStudents, isError: isErrorStudents, error: studentsError } = useQuery<UserProfile[], Error>({
+    queryKey: ['trainerStudents', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) throw new Error("Trainer ID not available");
+      return apiService.getTrainerStudents(); // This function in apiService should ideally use profile.id if not already
+    },
+    enabled: !!profile?.id, // Only run query if profile.id is available
+    onError: (err) => {
+      toast({
+        title: "Erro ao carregar alunos",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
+  });
 
-    fetchData();
-  }, []);
+  // Fetch trainer's workouts using useQuery
+  const { data: workouts = [], isLoading: isLoadingWorkouts, isError: isErrorWorkouts, error: workoutsError } = useQuery<Workout[], Error>({
+    queryKey: ['trainerWorkouts', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) throw new Error("Trainer ID not available");
+      // Assuming getTrainerWorkouts in apiService does not need trainerId if it uses the token
+      // or pass profile.id if it's needed by the endpoint
+      return apiService.getTrainerWorkouts();
+    },
+    enabled: !!profile?.id, // Only run query if profile.id is available
+    onError: (err) => {
+      toast({
+        title: "Erro ao carregar treinos",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
+  });
 
-  const activeStudents = students.filter(s => !s.isFirstLogin).length;
-  const avgProgress = students.length > 0 ? Math.round(students.reduce((acc, s) => acc + (Math.random() * 100), 0) / students.length) : 0;
+  const isLoading = isLoadingStudents || isLoadingWorkouts;
 
-  // Filtrar treinos ativos
-  const activeWorkouts = workouts.filter(w => w.active).length;
+  // Calculations (ensure students and workouts are defined)
+  const activeStudents = students?.filter(s => !s.is_first_login).length || 0;
+  // const avgProgress = students.length > 0 ? Math.round(students.reduce((acc, s) => acc + (Math.random() * 100), 0) / students.length) : 0; // Random progress removed
+
+  const activeWorkouts = workouts?.filter(w => w.active).length || 0;
+
+  // Handle student added from modal to refetch students list
+  const handleStudentAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['trainerStudents', profile?.id] });
+  };
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -61,7 +83,7 @@ const TrainerDashboard = () => {
               <h1 className="text-xl font-semibold text-slate-800">FitCoach</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="rounded-xl">
+              <Button variant="ghost" size="sm" className="rounded-xl" aria-label="Notificações">
                 <Bell className="h-4 w-4" />
               </Button>
               <div className="flex items-center space-x-3">
@@ -70,8 +92,8 @@ const TrainerDashboard = () => {
                     {user?.name?.charAt(0) || 'U'}
                   </span>
                 </div>
-                <span className="text-sm font-medium text-slate-700">{user?.name}</span>
-                <Button variant="ghost" size="sm" onClick={logout} className="rounded-xl">
+                <span className="hidden sm:inline text-sm font-medium text-slate-700">{user?.name}</span> {/* Oculto em telas < sm */}
+                <Button variant="ghost" size="sm" onClick={logout} className="rounded-xl" aria-label="Sair da conta">
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
@@ -245,11 +267,11 @@ const TrainerDashboard = () => {
                     </div>
                   </div>
                   
-                  <div className="mt-4 flex space-x-2">
-                    <Button size="sm" variant="outline" className="flex-1 rounded-xl border-slate-200">
+                  <div className="mt-4 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <Button size="sm" variant="outline" className="w-full sm:flex-1 rounded-xl border-slate-200"> {/* w-full para mobile, flex-1 para sm+ */}
                       Perfil
                     </Button>
-                    <Button size="sm" className="flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl">
+                    <Button size="sm" className="w-full sm:flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl"> {/* w-full para mobile, flex-1 para sm+ */}
                       Treinos
                     </Button>
                   </div>
@@ -259,23 +281,16 @@ const TrainerDashboard = () => {
           </div>
         )}
 
-        {/* Add Student Modal */}
-        <AddStudentModal 
-          open={isAddStudentOpen} 
-          onOpenChange={setIsAddStudentOpen}
-          onStudentAdded={() => {
-            // Refresh students list
-            const fetchStudents = async () => {
-              try {
-                const studentsData = await apiService.getTrainerStudents();
-                setStudents(studentsData);
-              } catch (error) {
-                console.error('Failed to fetch students:', error);
-              }
-            };
-            fetchStudents();
-          }}
-        />
+        {/* Add Student Modal - Lazy Loaded */}
+        {isAddStudentOpen && (
+          <Suspense fallback={<div className="text-center p-4">Carregando formulário...</div>}>
+            <AddStudentModal
+              open={isAddStudentOpen}
+              onOpenChange={setIsAddStudentOpen}
+              onStudentAdded={handleStudentAdded} // Use the existing handler for query invalidation
+            />
+          </Suspense>
+        )}
 
         {/* Treinos Recentes */}
         <Card className="bg-white rounded-2xl shadow-sm border-0 mb-8">

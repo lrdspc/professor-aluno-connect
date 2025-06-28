@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Award, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Award, CheckCircle, Share2 } from 'lucide-react'; // Added Share2
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -88,9 +88,35 @@ const WorkoutDetails = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-xl font-semibold text-slate-800">Detalhes do Treino</h1>
-            <Button variant="outline" onClick={() => navigate(-1)} className="rounded-xl">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-            </Button>
+            <div className="flex items-center space-x-2">
+              {navigator.share && ( // Conditionally render share button
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    if (workout) {
+                      try {
+                        await navigator.share({
+                          title: `Confira este treino: ${workout.name}`,
+                          text: `Dê uma olhada neste treino "${workout.name}" que encontrei no FitCoach Pro!`,
+                          url: window.location.href,
+                        });
+                        console.log('Conteúdo compartilhado com sucesso!');
+                      } catch (error) {
+                        console.error('Erro ao compartilhar:', error);
+                        // alert('Não foi possível compartilhar o conteúdo.'); // Optional: feedback de erro
+                      }
+                    }
+                  }}
+                  className="rounded-xl"
+                  aria-label="Compartilhar treino"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => navigate(-1)} className="rounded-xl">
+                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
+              </Button>
+            </div>
           </div>
         </div>
       </header>
