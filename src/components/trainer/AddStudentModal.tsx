@@ -6,16 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { apiService } from '@/services/api';
 
 interface AddStudentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onStudentAdded?: () => void; // Callback to refresh student list
 }
 
-const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange, onStudentAdded }) => {
+const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,26 +23,14 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange, o
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (!user?.id) {
-        throw new Error('Usuário não encontrado');
-      }
-
-      await apiService.registerStudent({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        trainer_id: user.id,
-        height: parseFloat(formData.height),
-        weight: parseFloat(formData.weight),
-        objective: formData.objective
-      });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Aluno cadastrado com sucesso!",
@@ -62,17 +47,11 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ open, onOpenChange, o
         objective: ''
       });
       
-      // Refresh student list
-      if (onStudentAdded) {
-        onStudentAdded();
-      }
-      
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to register student:', error);
       toast({
         title: "Erro ao cadastrar aluno",
-        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes.",
+        description: "Tente novamente em alguns instantes.",
         variant: "destructive"
       });
     } finally {

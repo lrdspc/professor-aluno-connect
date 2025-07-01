@@ -22,10 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Environment variables
-*.env
-.env.*
-!/.env.example # Allow .env.example for template files
-backend/.env
-.env
